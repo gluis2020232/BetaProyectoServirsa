@@ -1,0 +1,163 @@
+<h1>Dashboard Proyectos</h1>
+
+<hr>
+
+<BsButton @type="success" @onClick={{fn (mut this.modalProyecto) true}}>Agregar Proyecto</BsButton>
+<BsButton @type="secondary" @onClick={{fn (mut this.modalFechaArranque) true}}>Filtrar</BsButton>
+
+<div class="contenedor">
+  <!-- Select -->
+  <select class="select form-select w-25 p-2"
+    {{on "change" this.updateOption}}>
+    <option value="Activos">Activos</option>
+    <option value="Todos">Todos</option>
+    <option value="Completados">Completados</option>
+  </select>
+
+    <!-- Buscador -->
+  <nav class="navbar navbar-light mb-2">
+    <span class="navbar-brand"></span>
+    <form class="form-inline">
+      <input class="form-control mr-sm-2" type="search" placeholder="Buscar" aria-label="Search"
+      value="{{this.searchTerm}}"
+      {{on "input" this.updateSearchTerm}}
+      >
+    </form>
+  </nav>
+</div>
+
+<!-- Recorrer la data con Ember table -->
+<div class="demo-container">
+  <EmberTable as |t|>
+    <t.head
+      class="headTable"
+      @columns={{this.columns}}
+      @sorts={{this.sorts}}
+      @onUpdateSorts={{this.twoStateSorting}}
+      @widthConstraint='gte-container'
+    as |h| >
+      <h.row as |r|>
+        <r.cell as |column columnMeta|>
+          {{column.name}}
+
+          <EmberTh::ResizeHandle @columnMeta={{columnMeta}} />
+          <EmberTh::SortIndicator @columnMeta={{columnMeta}} />
+        </r.cell>
+      </h.row>
+    </t.head>
+
+    <t.body
+      class="bodyTable"
+      @rows={{this.sortedProjects}} as |b|>
+      <b.row as |r|>
+        <r.cell as |cell column row|>
+          {{#if (eq column.valuePath 'proyecto')}}
+            <LinkTo class="text-none" title="{{row.last_update}}" @route="project" @model="{{row.proyecto_id}}">
+              {{cell}}
+            </LinkTo>
+          {{else if (eq column.valuePath 'fecha_arranque')}}
+            {{#if row.fecha_arranque}}
+              {{date-format row.fecha_arranque 'DD/MM/YYYY'}}
+            {{else}}
+              {{cell}}
+            {{/if}}
+          {{else if (eq column.valuePath 'fecha_completamiento')}}
+            {{#if row.fecha_completamiento}}
+              {{date-format row.fecha_completamiento 'DD/MM/YYYY'}}
+            {{else}}
+              {{cell}}
+            {{/if}}
+          {{else}}
+            {{cell}}
+          {{/if}}
+        </r.cell>
+      </b.row>
+    </t.body>
+  </EmberTable>
+</div>
+
+<!-- Ordenamiento fecha arranque -->
+<BsModal
+  @size="sm"
+  @open={{this.modalFechaArranque}}
+  @onHidden={{fn (mut this.modalFechaArranque) false}} as |modal|>
+
+  <modal.header>
+    <h4 class="titleModal text-center modal-title">Filtrar por fecha de  arranque o completamiento</h4>
+  </modal.header>
+
+  <modal.body>
+    <div class="mg-3">
+      <label class="form-label">Fecha Arranque Inicio</label>
+      {{input type="date" value=this.fechaArranqueInicio class="form-control"}}
+    </div>
+    <div class="mg-3">
+      <label class="form-label">Fecha Arranque Fin</label>
+      {{input type="date" value=this.fechaArranqueFin class="form-control"}}
+    </div>
+    <div class="mg-3">
+      <label class="form-label">Fecha Completamiento Inicio</label>
+      {{input type="date" value=this.fechaCompletamientoInicio class="form-control"}}
+    </div>
+    <div class="mg-3">
+      <label class="form-label">Fecha Completamiento Fin</label>
+      {{input type="date" value=this.fechaCompletamientoFin class="form-control"}}
+    </div>
+  </modal.body>
+
+  <modal.footer>          
+    <BsButton @onClick={{modal.close}}>Cerrar</BsButton>
+    <BsButton @type="danger" @onClick={{this.limpiarFiltroFechas}} data-dismiss="modal">
+      Limpiar
+    </BsButton>
+  </modal.footer>
+</BsModal>
+  
+<!-- Modal Agregar proyecto -->
+<BsModal
+  @open={{this.modalProyecto}}
+  @onSubmit={{this.submit}}
+  @onHidden={{fn (mut this.modalProyecto) false}} as |modal|>
+
+  <modal.header>
+    <h4 class="modal-title">Agregar un proyecto</h4>
+  </modal.header>
+
+  <modal.body>
+    <div class="mg-3">
+      <label class="form-label">Nombre del cliente</label>
+      <input type="text" id="cliente" class="form-control" value={{this.cliente}}
+      {{on 'input' this.updateName}}
+      >
+    </div>
+    <div class="mg-3">
+      <label class="form-label">Nombre del proyecto</label>
+      <input type="text" id="proyecto" class="form-control" value={{this.proyecto}}
+      {{on 'input' this.updateProject}}
+      >
+    </div>
+    <div class="mg-3">
+      <label class="form-label">Fecha de arranque</label>
+      <input type="date" id="fecha_arranque" class="form-control" value={{this.fecha_arranque}}
+      {{on 'click' this.updateFechaArranque}}
+      >
+    </div>
+    <div class="mg-3">
+      <label class="form-label">Fecha de completamiento</label>
+      <input type="date" id="proyecto" class="form-control" value={{this.fecha_completamiento}}
+      {{on 'click' this.updateFechaCompletamiento}}
+      >
+    </div>
+  </modal.body>
+
+  <modal.footer>
+    <BsButton @type="danger" @onClick={{modal.close}}>Cancelar</BsButton>
+    <BsButton @type="success" @onClick={{modal.submit}} data-dismiss="modal">
+      Guardar
+    </BsButton>
+  </modal.footer>
+
+</BsModal>
+
+{{outlet}}
+

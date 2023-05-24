@@ -1,0 +1,17 @@
+
+h1 {
+  font-family: sans-serif;
+  font-weight: bold;
+}
+
+.headTable {
+  font-family: sans-serif;
+}
+
+.bodyTable {
+  font-family: sans-serif;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}

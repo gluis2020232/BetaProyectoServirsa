@@ -1,0 +1,107 @@
+
+<h1>Tareas de proyecto</h1>
+
+<hr>
+
+<LinkTo
+  class="px-4 py-2 border btn btn-primary btn-lm" @route="projects"
+>
+  <FaIcon @icon="angle-left"/>
+  Regresar
+</LinkTo>
+
+<br>
+
+<!-- Buscador -->
+<nav class="navbar navbar-light mb-2">
+  <span class="navbar-brand"></span>
+  <form class="form-inline">
+    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"
+    value="{{this.searchTerm}}"
+    {{on "input" this.updateSearchTerm}}
+    >
+  </form>
+</nav>
+
+
+<BsButton class="mb-4" @type="success" @onClick={{fn (mut this.modal) true}}>Agregar Tarea</BsButton>
+
+<!-- Modal Agregar proyecto -->
+<BsModal
+  @open={{this.modal}}
+  @onSubmit={{this.submit}}
+  @onHidden={{fn (mut this.modal) false}} as |modal|>
+  <modal.header>
+    <h4 class="modal-title">Agrear un proyecto</h4>
+  </modal.header>
+  <modal.body>
+    <div class="mg-3">
+      <label class="form-label">Nombre de la tarea</label>
+      <input type="text" id="nombre_tarea" class="form-control" value={{this.nombre_tarea}}
+      {{on 'input' this.updateNameWork}}
+      >
+    </div>
+    <div class="mg-3">
+      <label class="form-label">Enlace de tarea</label>
+      <input type="text" id="link" class="form-control" value={{this.link}}
+      {{on 'input' this.updateLink}}
+      >
+    </div>
+  </modal.body>
+  <modal.footer>
+    <BsButton @type="danger" @onClick={{modal.close}}>Cancelar</BsButton>
+    <BsButton @type="success" @onClick={{modal.submit}}>
+      Guardar
+    </BsButton>
+  </modal.footer>
+</BsModal>
+
+
+<EmberTable as |t|>
+  <t.head
+    class="headTable"
+    @columns={{this.columns}}
+    @sorts={{this.sorts}}
+    @onUpdateSorts={{action "twoStateSorting"}}
+    @widthConstraint='gte-container'
+  />
+  <t.body
+  class="bodyTable"
+  @rows={{this.model}} as |b|>
+    <b.row as |r|>
+      <r.cell as |cell column row|>
+        {{#if (eq column.valuePath 'link')}}
+          <a href="{{row.link}}" target="_blank" class="text-none">
+            {{row.link}}
+          </a>
+        {{else}}
+          {{cell}}
+        {{/if}}
+      </r.cell>
+    </b.row>
+  </t.body>
+</EmberTable>
+
+
+<!-- <table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Nombre tarea</th>
+      <th scope="col">Link</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each @model as |columna|}}
+      <tr>
+        <td>{{columna.nombre_tarea}}</td>
+        <td>
+          <a href="{{columna.link}}" target="_blank">
+            {{columna.link}}
+          </a>
+        </td>
+      </tr>
+    {{/each}}
+  </tbody>
+</table> -->
+
+{{outlet}}
